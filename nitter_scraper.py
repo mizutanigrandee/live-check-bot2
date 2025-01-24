@@ -84,7 +84,7 @@ ARTIST_MAP = {
     "https://nitter.poast.org/NiziU__official": "NiziU",
     "https://nitter.poast.org/Infinity_rJP": "関ジャニ∞?",
     "https://nitter.poast.org/ENHYPEN_JP": "ENHYPEN",
-    "https://nitter.poast.org/pledis_17jp: "17",
+    "https://nitter.poast.org/pledis_17jp": "SEVENTEEN",
     "https://nitter.poast.org/TXT_bighit_jp": "TXT",
     "https://nitter.poast.org/Stray_Kids_JP": "Stray Kids",
     "https://nitter.poast.org/SN__20200122": "Snow Man?",
