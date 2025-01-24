@@ -2,26 +2,132 @@ import requests
 import os
 import json
 
-# Nitterで監視するアカウントのURL一覧 (例)
+#################################
+#  NitterアカウントURLをまとめたリスト
+#################################
 SITES = [
-    # ここに実際のNitter URLを追加
-    "https://nitter.poast.org/BTS_twt",
-    "https://nitter.poast.org/higedan_Official",
-    "https://nitter.poast.org/KingGnu_JP",
+    "https://nitter.poast.org/KinKiKids_721",
+    "https://nitter.poast.org/Bz_Official",
+    "https://nitter.poast.org/SHINee",
+    "https://nitter.poast.org/EXO_NEWS_JP",
+    "https://nitter.poast.org/exile_news__",
+    "https://nitter.poast.org/gen_senden",
+    "https://nitter.poast.org/nogizaka46",
+    "https://nitter.poast.org/JUMP_Storm",
+    "https://nitter.poast.org/generationsfext",
+    "https://nitter.poast.org/BTS_jp_official",
+    "https://nitter.poast.org/3rd_JSB_NEWS",
+    "https://nitter.poast.org/backnumberstaff",
+    "https://nitter.poast.org/BLACKPINK",
+    "https://nitter.poast.org/sasfannet",
+    "https://nitter.poast.org/NiziU__official",
+    "https://nitter.poast.org/Infinity_rJP",
+    "https://nitter.poast.org/ENHYPEN_JP",
+    "https://nitter.poast.org/pledis_17jp",  
+    "https://nitter.poast.org/TXT_bighit_jp",
+    "https://nitter.poast.org/Stray_Kids_JP",
+    "https://nitter.poast.org/SN__20200122",
+    "https://nitter.poast.org/BEFIRSTofficial",
+    "https://nitter.poast.org/SixTONES_SME",
+    "https://nitter.poast.org/reissuerecords",
+    "https://nitter.poast.org/vaundy_engawa",
+    "https://nitter.poast.org/AORINGOHUZIN",
     "https://nitter.poast.org/YOASOBI_staff",
+    "https://nitter.poast.org/spitz30th_UM",
+    "https://nitter.poast.org/SekaiNoOwariOFC",
+    "https://nitter.poast.org/mc_official_jp",
+    "https://nitter.poast.org/aimyonGtter",
+    "https://nitter.poast.org/KingGnu_JP",
+    "https://nitter.poast.org/officialhige",
+    "https://nitter.poast.org/ado1024imokenp",
+    "https://nitter.poast.org/yuzu_official",
+    "https://nitter.poast.org/ONEOKROCK_japan",
+    "https://nitter.poast.org/JYPETWICE_JAPAN",
+    "https://nitter.poast.org/sudamasakimusic",
+    "https://nitter.poast.org/BROS_1991",
+    "https://nitter.poast.org/fujiikazestaff",
+    "https://nitter.poast.org/dcte_staff",
+    "https://nitter.poast.org/tobeofficial_jp",
+    "https://nitter.poast.org/kp_official0523",
+    "https://nitter.poast.org/glay_official",
+    "https://nitter.poast.org/LArc_official",
+    "https://nitter.poast.org/OVTT_official",
+    "https://nitter.poast.org/728_Storm",
+    "https://nitter.poast.org/Aegroupofficial",
+    "https://nitter.poast.org/hikki_staff",
+    "https://nitter.poast.org/TeamKobukuro",
+    "https://nitter.poast.org/NCT_OFFICIAL_JP",
+    "https://nitter.poast.org/official__INI",
+    "https://nitter.poast.org/Da_iCE_STAFF",
+    "https://nitter.poast.org/number_i_staff",
 ]
 
-# 検知キーワード(大文字小文字を無視して判定)
-KEYWORDS = ["京セラドーム", "ヤンマースタジアム", "kyocera"]
-
-# (任意) URL→アーティスト名の対応表
+###################################################
+# URL→アーティスト名 (推測含む) の対応辞書
+# 必要に応じて修正・加筆ください
+###################################################
 ARTIST_MAP = {
-    "https://nitter.poast.org/BTS_twt": "BTS",
-    "https://nitter.poast.org/higedan_Official": "Official髭男dism",
-    "https://nitter.poast.org/KingGnu_JP": "King Gnu",
+    "https://nitter.poast.org/KinKiKids_721": "KinKi Kids",
+    "https://nitter.poast.org/Bz_Official": "B'z",
+    "https://nitter.poast.org/SHINee": "SHINee",
+    "https://nitter.poast.org/EXO_NEWS_JP": "EXO",
+    "https://nitter.poast.org/exile_news__": "EXILE",
+    "https://nitter.poast.org/gen_senden": "星野源",
+    "https://nitter.poast.org/nogizaka46": "乃木坂46",
+    "https://nitter.poast.org/JUMP_Storm": "Hey!Say!JUMP",
+    "https://nitter.poast.org/generationsfext": "GENERATIONS",
+    "https://nitter.poast.org/BTS_jp_official": "BTS",
+    "https://nitter.poast.org/3rd_JSB_NEWS": "三代目J SOUL BROTHERS",
+    "https://nitter.poast.org/backnumberstaff": "back number",
+    "https://nitter.poast.org/BLACKPINK": "BLACKPINK",
+    "https://nitter.poast.org/sasfannet": "サザンオールスターズ?",
+    "https://nitter.poast.org/NiziU__official": "NiziU",
+    "https://nitter.poast.org/Infinity_rJP": "関ジャニ∞?",
+    "https://nitter.poast.org/ENHYPEN_JP": "ENHYPEN",
+    "https://nitter.poast.org/pledis_17jp: "17",
+    "https://nitter.poast.org/TXT_bighit_jp": "TXT",
+    "https://nitter.poast.org/Stray_Kids_JP": "Stray Kids",
+    "https://nitter.poast.org/SN__20200122": "Snow Man?",
+    "https://nitter.poast.org/BEFIRSTofficial": "BE:FIRST",
+    "https://nitter.poast.org/SixTONES_SME": "SixTONES",
+    "https://nitter.poast.org/reissuerecords": "米津玄師",
+    "https://nitter.poast.org/vaundy_engawa": "Vaundy",
+    "https://nitter.poast.org/AORINGOHUZIN": "グリーンアップル",
     "https://nitter.poast.org/YOASOBI_staff": "YOASOBI",
-    # ... 必要に応じて追加
+    "https://nitter.poast.org/spitz30th_UM": "スピッツ",
+    "https://nitter.poast.org/SekaiNoOwariOFC": "SEKAI NO OWARI",
+    "https://nitter.poast.org/mc_official_jp": "Mr.Children",
+    "https://nitter.poast.org/aimyonGtter": "あいみょん",
+    "https://nitter.poast.org/KingGnu_JP": "King Gnu",
+    "https://nitter.poast.org/officialhige": "Official髭男dism",
+    "https://nitter.poast.org/ado1024imokenp": "Ado",
+    "https://nitter.poast.org/yuzu_official": "ゆず",
+    "https://nitter.poast.org/ONEOKROCK_japan": "ONE OK ROCK",
+    "https://nitter.poast.org/JYPETWICE_JAPAN": "TWICE",
+    "https://nitter.poast.org/sudamasakimusic": "菅田将暉",
+    "https://nitter.poast.org/BROS_1991": "福山雅治",
+    "https://nitter.poast.org/fujiikazestaff": "藤井風",
+    "https://nitter.poast.org/dcte_staff": "DREAMS COME TRUE?",
+    "https://nitter.poast.org/tobeofficial_jp": "TOBE",
+    "https://nitter.poast.org/kp_official0523": "King & Prince",
+    "https://nitter.poast.org/glay_official": "GLAY",
+    "https://nitter.poast.org/LArc_official": "L'Arc-en-Ciel",
+    "https://nitter.poast.org/OVTT_official": "timelesz",
+    "https://nitter.poast.org/728_Storm": "なにわ男子",
+    "https://nitter.poast.org/Aegroupofficial": "Aぇ group",
+    "https://nitter.poast.org/hikki_staff": "宇多田ヒカル",
+    "https://nitter.poast.org/TeamKobukuro": "コブクロ",
+    "https://nitter.poast.org/NCT_OFFICIAL_JP": "NCT",
+    "https://nitter.poast.org/official__INI": "INI",
+    "https://nitter.poast.org/Da_iCE_STAFF": "Da-iCE",
+    "https://nitter.poast.org/number_i_staff": "NUMBER I",
 }
+
+
+###################################################
+#  検知したいキーワード（大文字小文字を無視）
+###################################################
+KEYWORDS = ["京セラドーム", "ヤンマースタジアム", "kyocera"]
 
 def load_found_snippets():
     """
@@ -35,7 +141,7 @@ def load_found_snippets():
 
 def save_found_snippets(data):
     """
-    found_snippets_nitter.json に書き込み
+    found_snippets_nitter.json に書き込む
     """
     with open("found_snippets_nitter.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
@@ -55,8 +161,9 @@ def send_slack_message(text):
 
 def detect_new_lines(url, found_data):
     """
-    NitterページをGETし、キーワード含む行を抽出。
-    既にfound_dataに登録されていない行だけを返す。
+    1. Nitterページを取得
+    2. 行ごとに分割し、小文字化してキーワード検索
+    3. 既にfound_dataにある行はスキップ
     """
     new_lines = []
     try:
@@ -65,12 +172,9 @@ def detect_new_lines(url, found_data):
         lines = resp.text.split("\n")
 
         for line in lines:
-            # 行を小文字化
             lower_line = line.lower()
             for kw in KEYWORDS:
-                # キーワードも小文字化
                 if kw.lower() in lower_line:
-                    # まだ登録されていないなら、新行とみなす
                     if line not in found_data.get(url, []):
                         new_lines.append(line.strip())
                     break
@@ -84,6 +188,7 @@ if __name__ == "__main__":
     for url in SITES:
         artist_name = ARTIST_MAP.get(url, "アーティスト不明")
         newly_found_lines = detect_new_lines(url, found_data)
+
         if newly_found_lines:
             for line in newly_found_lines:
                 msg = (
@@ -95,7 +200,7 @@ if __name__ == "__main__":
                 print(msg)
                 send_slack_message(msg)
 
-            # found_data に追加
+            # 新たに検出した行を found_data に追記
             if url not in found_data:
                 found_data[url] = []
             found_data[url].extend(newly_found_lines)
