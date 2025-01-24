@@ -129,6 +129,10 @@ ARTIST_MAP = {
 ###################################################
 KEYWORDS = ["京セラドーム", "ヤンマースタジアム", "kyocera"]
 
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+}
+
 def load_found_snippets():
     """
     過去に検出した行情報を found_snippets_nitter.json から読み込む。
@@ -167,10 +171,10 @@ def detect_new_lines(url, found_data):
     """
     new_lines = []
     try:
-        resp = requests.get(url, timeout=10)
+        resp = requests.get(url, headers=HEADERS, timeout=10)
         resp.raise_for_status()
+  
         lines = resp.text.split("\n")
-
         for line in lines:
             lower_line = line.lower()
             for kw in KEYWORDS:
@@ -200,7 +204,7 @@ if __name__ == "__main__":
                 print(msg)
                 send_slack_message(msg)
 
-            # 新たに検出した行を found_data に追記
+            # found_data に追記
             if url not in found_data:
                 found_data[url] = []
             found_data[url].extend(newly_found_lines)
